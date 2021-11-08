@@ -1,21 +1,23 @@
 const stadistics = (validatedLinks, validate) => {
-  const total = validatedLinks.length
-  const unique = [...new Set(validatedLinks.map(link => link.href))].length
-  let broken = 0;
-
-  for (const link of validatedLinks) {
-    if (link.ok === 'fail') {
-      broken++
-    }
-  }
+  const total = validatedLinks.length;
+  const unique = [...new Set(validatedLinks.map((link) => link.href))].length;
+  // Array.from(unique).length
 
   if (validate) {
-    return {total, unique, broken}
+    let broken = 0;
+
+    validatedLinks.forEach((link) => {
+      if (link.ok === 'fail') {
+        broken += 1;
+      }
+    });
+
+    return { total, unique, broken };
   }
 
-  return {total, unique}
-}
+  return { total, unique };
+};
 
 module.exports = {
-  stadistics
-}
+  stadistics,
+};

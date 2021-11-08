@@ -1,19 +1,36 @@
-const linksExtractor = (file, path) => {
+const fs = require('fs');
 
-  const regex = /\[([^\[]+)\](\((https?:\/\/[^()]+)\)$)/gm
-  let newData = [];
-  
-  const matches = file.match(regex)
-  const singleMatch = /\[([^\[]+)\]\((.*)\)/
+const fileReader = (path) => fs.readFileSync(path, 'utf-8');
 
-  for (let i = 0; i < matches.length; i++) {
-    let text = singleMatch.exec(matches[i])
-    newData.push({text:text[1], href: text[2], file: path})
+const readFile = (data, filePath) => {
+  const regex = /\[([^\[]+)\](\((https?:\/\/[^()]+)\)$)/gm;
+  const newData = [];
+
+  const matches = data.match(regex);
+  const singleMatch = /\[([^\[]+)\]\((.*)\)/;
+
+  if (!matches) return newData;
+
+  for (let i = 0; i < matches.length; i += 1) {
+    const match = singleMatch.exec(matches[i]);
+    newData.push({ text: match[1], href: match[2], file: filePath });
   }
 
   return newData;
-}
+};
+
+const linksExtractor = (files) => {
+  let linksArray = [];
+
+  files.forEach((filePath) => {
+    const data = fileReader(filePath);
+    const links = readFile(data, filePath);
+    linksArray = [...linksArray, ...links];
+  });
+
+  return linksArray;
+};
 
 module.exports = {
-  linksExtractor
-}
+  linksExtractor,
+};

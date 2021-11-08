@@ -1,29 +1,18 @@
 #!/usr/bin/env node
 
-const inquirer = require('inquirer');
-const path = require('path');
-const getfiles = require('./getfiles');
-const file = require('./archive');
-const urls = require('./urls');
-const chalk = require('chalk');
-const route = process.cwd();
+const { mdLinks } = require('./src/mdLinks');
+const { stadistics } = require('./src/stadistics');
 
-inquirer.prompt([{
-  type: 'rawlist',
-  name: 'path',
-  itemType: '',
-  message: chalk.yellow ('Select a file .md to check URL status'),
-  choices: getfiles.browseDirectories(route),
-}])
-  .then(currentFile => {
-    console.log('Name of analyzing file: ' + currentFile.path);
-    const join = path.join(route, currentFile.path);
-    const allUrl = file.getRoute(join);
+const validate = process.argv.some((value) => value === '--validate');
+const stats = process.argv.some((value) => value === '--stats');
 
-    allUrl.forEach((url,i) => { if (urls.validateUrl(allUrl[i])) {
-      console.log(allUrl)
-    }})
-  })
-  .catch(error => {
-    console.log(error);
-  });
+console.log(process.argv);
+
+mdLinks(process.argv[2], { validate })
+  .then((links) => {
+    if (stats) {
+      console.log(stadistics(links, validate));
+    } else {
+      console.log(links);
+    }
+  }).catch((err) => console.error(err.message));
